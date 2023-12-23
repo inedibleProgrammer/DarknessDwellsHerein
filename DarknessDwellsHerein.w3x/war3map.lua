@@ -1,29 +1,40 @@
-gg_trg_Melee_Initialization = nil
+gg_trg_LaunchLua = nil
 function InitGlobals()
 end
 
-function Trig_Melee_Initialization_Actions()
-MeleeStartingVisibility()
-MeleeStartingHeroLimit()
-MeleeGrantHeroItems()
-MeleeStartingResources()
-MeleeClearExcessUnits()
-MeleeStartingUnits()
-MeleeStartingAI()
-MeleeInitVictoryDefeat()
+
+
+local GameLoop = {}
+
+function GameLoop.Init()
+  print("GameLoop Init")
 end
 
-function InitTrig_Melee_Initialization()
-gg_trg_Melee_Initialization = CreateTrigger()
-TriggerAddAction(gg_trg_Melee_Initialization, Trig_Melee_Initialization_Actions)
+
+
+function LaunchLua()
+  print("LaunchLua Start")  
+  GameLoop.Init()
+  print("LaunchLua End")
+end
+
+
+
+function Trig_LaunchLua_Actions()
+    LaunchLua()
+end
+
+function InitTrig_LaunchLua()
+gg_trg_LaunchLua = CreateTrigger()
+TriggerAddAction(gg_trg_LaunchLua, Trig_LaunchLua_Actions)
 end
 
 function InitCustomTriggers()
-InitTrig_Melee_Initialization()
+InitTrig_LaunchLua()
 end
 
 function RunInitializationTriggers()
-ConditionalTriggerExecute(gg_trg_Melee_Initialization)
+ConditionalTriggerExecute(gg_trg_LaunchLua)
 end
 
 function InitCustomPlayerSlots()
