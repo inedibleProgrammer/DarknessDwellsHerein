@@ -43,3 +43,8 @@ STRING 9
 Loading screen text
 }
 
+STRING 10
+{
+This is an experiment
+}
+

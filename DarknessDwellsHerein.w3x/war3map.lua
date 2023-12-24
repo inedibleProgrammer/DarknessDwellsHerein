@@ -1,4 +1,5 @@
 gg_trg_LaunchLua = nil
+gg_trg_PrintMessage = nil
 function InitGlobals()
 end
 
@@ -6,12 +7,17 @@ end
 
 local GameLoop = {}
 
+function GameLoop.ReturnsTrue()
+  return true
+end
+
 function GameLoop.Init(triggerWrapper)
   print("GameLoop Init Start")
   GameLoop.triggerWrapper = triggerWrapper
   GameLoop.triggerWrapper.CreateTrigger()
   print("GameLoop Init End")
 end
+
 
 
 
@@ -26,6 +32,19 @@ end
 
 
 
+Test_GameLoop = {}
+
+
+function Test_GameLoop.RunTests()
+  assert(GameLoop.ReturnsTrue(), "Expected true")
+end
+
+
+
+
+
+-- UNIT_TEST = true
+UNIT_TEST = false
 
 
 function LaunchLua()
@@ -34,6 +53,23 @@ function LaunchLua()
   print("LaunchLua End")
 end
 
+
+if (UNIT_TEST) then
+  -- dbg = require("debugger")
+  -- dbg()
+  Test_GameLoop.RunTests()
+end
+
+
+
+function Trig_PrintMessage_Actions()
+DisplayTextToForce(bj_FORCE_PLAYER[0], "TRIGSTR_010")
+end
+
+function InitTrig_PrintMessage()
+gg_trg_PrintMessage = CreateTrigger()
+TriggerAddAction(gg_trg_PrintMessage, Trig_PrintMessage_Actions)
+end
 
 function Trig_LaunchLua_Actions()
     LaunchLua()
@@ -45,10 +81,12 @@ TriggerAddAction(gg_trg_LaunchLua, Trig_LaunchLua_Actions)
 end
 
 function InitCustomTriggers()
+InitTrig_PrintMessage()
 InitTrig_LaunchLua()
 end
 
 function RunInitializationTriggers()
+ConditionalTriggerExecute(gg_trg_PrintMessage)
 ConditionalTriggerExecute(gg_trg_LaunchLua)
 end
 
