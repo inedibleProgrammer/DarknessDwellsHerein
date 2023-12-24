@@ -6,18 +6,33 @@ end
 
 local GameLoop = {}
 
-function GameLoop.Init()
-  print("GameLoop Init")
+function GameLoop.Init(triggerWrapper)
+  print("GameLoop Init Start")
+  GameLoop.triggerWrapper = triggerWrapper
+  GameLoop.triggerWrapper.CreateTrigger()
+  print("GameLoop Init End")
 end
+
+
+
+local TriggerWrapper = {}
+
+
+function TriggerWrapper.CreateTrigger()
+  local trigger = CreateTrigger()
+  return trigger
+end
+
+
+
 
 
 
 function LaunchLua()
-  print("LaunchLua Start")  
-  GameLoop.Init()
+  print("LaunchLua Start")
+  GameLoop.Init(TriggerWrapper)
   print("LaunchLua End")
 end
-
 
 
 function Trig_LaunchLua_Actions()
