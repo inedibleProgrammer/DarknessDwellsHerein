@@ -20,18 +20,20 @@ function LoggerReturnsSize()
   assert(Logger.Size() == 1)
 end
 
-function LoggerPrints3Messages()
+function LoggerPrintsFirst3Messages()
   Logger.Init(dummyPrintWrapper)
   Logger.Log("First Message")
   Logger.Log("Second Message")
   Logger.Log("Third Message")
-  Logger.Dump(1, 3) -- Check display yourself
+  request = Logger.Dump(1, 3)
+  for k,v in pairs(request) do
+  end
 end
 
 function Test_Logger.RunTests()
   LoggerReturnsTrue()
   LoggerReturnsSize()
-  LoggerPrints3Messages()
+  LoggerPrintsFirst3Messages()
 end
 
 

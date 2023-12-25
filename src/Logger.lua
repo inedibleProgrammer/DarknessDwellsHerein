@@ -19,10 +19,12 @@ function Logger.Size()
   return Logger.size
 end
 
-function Logger.Dump(start, count)
+function Logger.GetMessages(start, count)
+  request = {}
   for i = start, start + count - 1  do
-    message = Logger.messages[i]
-    Logger.printWrapper.DisplayTextToPlayer(0, 0, 0, message)
+    -- message = Logger.messages[i]
+    -- Logger.printWrapper.DisplayTextToPlayer(0, 0, 0, message)
+    table.insert(request, Logger.messages[i])
   end
 end
 
