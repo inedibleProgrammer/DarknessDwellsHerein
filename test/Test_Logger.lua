@@ -15,18 +15,25 @@ end
 
 
 function LoggerReturnsSize()
-  Logger.Init(dummyPrintWrapper)
+  Logger.Init()
   Logger.Log("This is a test")
   assert(Logger.Size() == 1)
 end
 
 function LoggerPrintsFirst3Messages()
-  Logger.Init(dummyPrintWrapper)
-  Logger.Log("First Message")
-  Logger.Log("Second Message")
-  Logger.Log("Third Message")
-  request = Logger.Dump(1, 3)
-  for k,v in pairs(request) do
+  Logger.Init()
+  local testData = {}
+  testData[1] = "First Message"
+  testData[2] = "Second Message"
+  testData[3] = "Third Message"
+
+  Logger.Log(testData[1])
+  Logger.Log(testData[2])
+  Logger.Log(testData[3])
+  local request = Logger.GetMessages(1, 3)
+
+  for i = 1, 3, 1 do
+    assert(request[i] == testData[i])
   end
 end
 

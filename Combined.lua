@@ -21,8 +21,8 @@ function Logger.ReturnsTrue()
   return true
 end
 
-function Logger.Init(printWrapper)
-  Logger.printWrapper = printWrapper
+function Logger.Init()
+  -- Logger.printWrapper = printWrapper
   Logger.messages = {}
   Logger.size = 0
 end
@@ -37,12 +37,13 @@ function Logger.Size()
 end
 
 function Logger.GetMessages(start, count)
-  request = {}
+  local request = {}
   for i = start, start + count - 1  do
     -- message = Logger.messages[i]
     -- Logger.printWrapper.DisplayTextToPlayer(0, 0, 0, message)
     table.insert(request, Logger.messages[i])
   end
+  return request
 end
 
 
@@ -101,18 +102,27 @@ end
 
 
 function LoggerReturnsSize()
-  Logger.Init(dummyPrintWrapper)
+  Logger.Init()
   Logger.Log("This is a test")
   assert(Logger.Size() == 1)
 end
 
 function LoggerPrintsFirst3Messages()
-  Logger.Init(dummyPrintWrapper)
-  Logger.Log("First Message")
-  Logger.Log("Second Message")
-  Logger.Log("Third Message")
-  request = Logger.Dump(1, 3)
-  for k,v in pairs(request) do
+  Logger.Init()
+
+  local testData = {}
+  testData[1] = "First Message"
+  testData[2] = "Second Message"
+  testData[3] = "Third Message"
+
+  
+  Logger.Log(testData[1])
+  Logger.Log(testData[2])
+  Logger.Log(testData[3])
+  local request = Logger.GetMessages(1, 3)
+
+  for i = 1, 3, 1 do
+    assert(request[i] == testData[i])
   end
 end
 
