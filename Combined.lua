@@ -1,4 +1,27 @@
 
+local Commands = {}
+
+
+
+function Commands.Init(logger, triggerWrapper, playerWrapper)
+  Commands.logger = logger
+  Commands.triggerWrapper = triggerWrapper
+  Commands.playerWrapper = playerWrapper
+  Commands.list = {}
+end
+
+function Commands.Add(command)
+  table.insert(Commands.list, command)
+  Commands.logger.Log("Command added")
+end
+
+
+function Commands.AnyPlayerStringInit()
+end
+
+
+
+
 
 local GameLoop = {}
 
@@ -6,11 +29,14 @@ function GameLoop.ReturnsTrue()
   return true
 end
 
-function GameLoop.Init(triggerWrapper)
-  print("GameLoop Init Start")
+function GameLoop.Init(logger, triggerWrapper)
+  -- print("GameLoop Init Start")
+  GameLoop.logger = logger
+  GameLoop.logger.Log("GameLoop Init Start")
   GameLoop.triggerWrapper = triggerWrapper
   GameLoop.triggerWrapper.CreateTrigger()
-  print("GameLoop Init End")
+  -- print("GameLoop Init End")
+  GameLoop.logger.Log("GameLoop Init End")
 end
 
 
@@ -50,6 +76,42 @@ end
 
 
 
+-- This is a generated file
+local MapInfo = {}
+MapInfo.name = "Darkness Dwells Herein"
+MapInfo.version = "Alpha"
+MapInfo.commit = "c8df0cb702839f7c1d6081c015580c414fbf3c01"
+
+
+local PlayerManager = {}
+
+
+
+
+function PlayerManager.Init(logger, colors, playerWrapper, triggerWrapper)
+  PlayerManager.logger = logger
+  PlayerManager.colors = colors
+  PlayerManager.playerWrapper = playerWrapper
+  PlayerManager.playerList = {}
+end
+
+
+function PlayerManager.AnyPlayerChatString()
+end
+
+
+
+
+local PlayerWrapper = {}
+
+
+function PlayerWrapper.Init()
+
+end
+
+
+
+
 
 PrintWrapper = {}
 
@@ -70,6 +132,15 @@ local TriggerWrapper = {}
 function TriggerWrapper.CreateTrigger()
   local trigger = CreateTrigger()
   return trigger
+end
+
+
+function TriggerWrapper.TriggerAddAction(trigger, handler)
+  TriggerAddAction(trigger, handler)
+end
+
+function TriggerWrapper.TriggerRegisterTimerEvent(trigger, timeout, periodic)
+  TriggerRegisterTimerEvent(trigger, timeout, periodic)
 end
 
 
@@ -109,13 +180,11 @@ end
 
 function LoggerPrintsFirst3Messages()
   Logger.Init()
-
   local testData = {}
   testData[1] = "First Message"
   testData[2] = "Second Message"
   testData[3] = "Third Message"
 
-  
   Logger.Log(testData[1])
   Logger.Log(testData[2])
   Logger.Log(testData[3])
@@ -124,6 +193,8 @@ function LoggerPrintsFirst3Messages()
   for i = 1, 3, 1 do
     assert(request[i] == testData[i])
   end
+
+  assert(Logger.Size() == 3)
 end
 
 function Test_Logger.RunTests()
@@ -136,16 +207,31 @@ end
 
 
 
+--[[ Darkness Dwells Herein ]]
 
 UNIT_TEST = true
 -- UNIT_TEST = false
 
 
+
+-- Map Info:
+local MapInfo = {}
+MapInfo.version = "0.0.0"
+MapInfo.commit = ""
+
+-- SuperUsers:
+local SuperUserList = {
+  "worldedit",
+  "MasterLich#11192"
+}
+
 function LaunchLua()
-  print("LaunchLua Start")
-  Logger.Init(PrintWrapper)
-  GameLoop.Init(TriggerWrapper)
-  print("LaunchLua End")
+  -- print("LaunchLua Start")
+  Logger.Init()
+  Logger.Log("LaunchLua Start")
+  GameLoop.Init(Logger, TriggerWrapper)
+  -- print("LaunchLua End")
+  Logger.Log("LaunchLua End")
 end
 
 

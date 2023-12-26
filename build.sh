@@ -1,13 +1,35 @@
 #!/bin/bash
 
+MapName="Darkness Dwells Herein"
+Version="Alpha"
+
 # Output file
 output_file="Combined.lua"
 
-# LaunchLua file -- the main map file
+# LaunchLua file -- the main file
 launch_lua="DarknessDwellsHerein.lua"
+
+# Generated File -- contains application details
+generated_file="src/MapInfo.lua"
+
+# Remove existing generated file
+rm -f "$generated_file"
 
 # Remove existing output file
 rm -f "$output_file"
+
+
+# Generate the MapInfo file
+git_commit=$(git rev-parse HEAD)
+map_file="\
+-- This is a generated file
+local MapInfo = {}
+MapInfo.name = \"$MapName\"
+MapInfo.version = \"$Version\"
+MapInfo.commit = \"$git_commit\"
+"
+
+echo "${map_file}" > $generated_file
 
 # Concatenate all src .lua files
 for file in src/*.lua; do

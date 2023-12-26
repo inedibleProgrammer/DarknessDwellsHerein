@@ -8,3 +8,12 @@ function TriggerWrapper.CreateTrigger()
 end
 
 
+function TriggerWrapper.TriggerAddAction(trigger, handler)
+  TriggerAddAction(trigger, handler)
+end
+
+function TriggerWrapper.TriggerRegisterTimerEvent(trigger, timeout, periodic)
+  TriggerRegisterTimerEvent(trigger, timeout, periodic)
+end
+
+

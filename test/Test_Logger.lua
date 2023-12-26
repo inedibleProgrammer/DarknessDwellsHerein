@@ -35,6 +35,8 @@ function LoggerPrintsFirst3Messages()
   for i = 1, 3, 1 do
     assert(request[i] == testData[i])
   end
+
+  assert(Logger.Size() == 3)
 end
 
 function Test_Logger.RunTests()
