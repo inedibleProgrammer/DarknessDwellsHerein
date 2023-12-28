@@ -16,4 +16,8 @@ function TriggerWrapper.TriggerRegisterTimerEvent(trigger, timeout, periodic)
   TriggerRegisterTimerEvent(trigger, timeout, periodic)
 end
 
+function TriggerWrapper.TriggerRegisterPlayerChatEvent(trigger, player, messageActivator, exactMatchOnly)
+  TriggerRegisterPlayerChatEvent(trigger, player, messageActivator, exactMatchOnly)
+end
+
 

@@ -38,6 +38,13 @@ for file in src/*.lua; do
     echo "" >> "$output_file"  # Add a newline between files
 done
 
+# Concatenate all mock .lua files
+for file in test/mock/*.lua; do
+    [ -e "$file" ] || continue
+    cat "$file" >> "$output_file"
+    echo "" >> "$output_file"  # Add a newline between files
+done
+
 # Concatenate all test .lua files
 for file in test/*.lua; do
     [ -e "$file" ] || continue

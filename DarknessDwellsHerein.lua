@@ -1,27 +1,29 @@
 --[[ Darkness Dwells Herein ]]
 
-UNIT_TEST = true
--- UNIT_TEST = false
+-- UNIT_TEST = true
 
 
-
--- Map Info:
-local MapInfo = {}
-MapInfo.version = "0.0.0"
-MapInfo.commit = ""
+local GameConfig = {}
 
 -- SuperUsers:
-local SuperUserList = {
+GameConfig.SuperUserList = {
   "worldedit",
   "MasterLich#11192"
 }
 
+function thing()
+  PlayerManager.Init(Logger, Colors, PlayerWrapper, TriggerWrapper)
+end
+
 function LaunchLua()
-  -- print("LaunchLua Start")
+  print("LaunchLua Start")
   Logger.Init()
   Logger.Log("LaunchLua Start")
   GameLoop.Init(Logger, TriggerWrapper)
-  -- print("LaunchLua End")
+  Commands.Init(Logger, TriggerWrapper, PlayerWrapper)
+  print("after commands")
+  xpcall(thing, print)
+  print("LaunchLua End")
   Logger.Log("LaunchLua End")
 end
 
@@ -31,6 +33,7 @@ if (UNIT_TEST) then
   -- dbg()
   Test_GameLoop.RunTests()
   Test_Logger.RunTests()
+  Test_PlayerManager.RunTests()
 end
 
 
