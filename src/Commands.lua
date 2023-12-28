@@ -15,7 +15,4 @@ function Commands.Add(command)
 end
 
 
-function Commands.AnyPlayerStringInit()
-end
-
 

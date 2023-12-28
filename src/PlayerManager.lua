@@ -13,7 +13,6 @@ function PlayerManager.ReturnsTrue()
 end
 
 function PlayerManager.Init(logger, colors, playerWrapper, triggerWrapper)
-  -- print("player manager init")
   PlayerManager.logger = logger
   PlayerManager.colors = colors
   PlayerManager.playerWrapper = playerWrapper
@@ -21,9 +20,7 @@ function PlayerManager.Init(logger, colors, playerWrapper, triggerWrapper)
   PlayerManager.playerList = {}
   PlayerManager.playerChatTrigger = triggerWrapper.CreateTrigger()
   PlayerManager.triggerWrapper.TriggerAddAction(PlayerManager.playerChatTrigger, PlayerChatAction)
-  -- print("before chat thing")
   PlayerManager.AnyPlayerChatString()
-  -- print("player manager end")
 end
 
 

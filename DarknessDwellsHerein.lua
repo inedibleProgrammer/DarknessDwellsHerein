@@ -11,20 +11,19 @@ GameConfig.SuperUserList = {
   "MasterLich#11192"
 }
 
-function thing()
+function GameInit()
+  Logger.Init()
+  PlayerWrapper.Init()
+  GameLoop.Init(Logger, TriggerWrapper)
+  Commands.Init(Logger, TriggerWrapper, PlayerWrapper)
+  print("after commands")
   PlayerManager.Init(Logger, Colors, PlayerWrapper, TriggerWrapper)
 end
 
 function LaunchLua()
   print("LaunchLua Start")
-  Logger.Init()
-  Logger.Log("LaunchLua Start")
-  GameLoop.Init(Logger, TriggerWrapper)
-  Commands.Init(Logger, TriggerWrapper, PlayerWrapper)
-  print("after commands")
-  xpcall(thing, print)
+  xpcall(GameInit, print)
   print("LaunchLua End")
-  Logger.Log("LaunchLua End")
 end
 
 

@@ -63,9 +63,6 @@ function Commands.Add(command)
 end
 
 
-function Commands.AnyPlayerStringInit()
-end
-
 
 
 
@@ -127,7 +124,7 @@ end
 local MapInfo = {}
 MapInfo.name = "Darkness Dwells Herein"
 MapInfo.version = "Alpha"
-MapInfo.commit = "228e2a1ce9100b6410182e9cd83059726eac79c2"
+MapInfo.commit = "fe6de9fd31721d75232c561180a0833d6809af47"
 
 
 local PlayerManager = {}
@@ -145,7 +142,6 @@ function PlayerManager.ReturnsTrue()
 end
 
 function PlayerManager.Init(logger, colors, playerWrapper, triggerWrapper)
-  -- print("player manager init")
   PlayerManager.logger = logger
   PlayerManager.colors = colors
   PlayerManager.playerWrapper = playerWrapper
@@ -153,9 +149,7 @@ function PlayerManager.Init(logger, colors, playerWrapper, triggerWrapper)
   PlayerManager.playerList = {}
   PlayerManager.playerChatTrigger = triggerWrapper.CreateTrigger()
   PlayerManager.triggerWrapper.TriggerAddAction(PlayerManager.playerChatTrigger, PlayerChatAction)
-  -- print("before chat thing")
   PlayerManager.AnyPlayerChatString()
-  -- print("player manager end")
 end
 
 
@@ -336,20 +330,19 @@ GameConfig.SuperUserList = {
   "MasterLich#11192"
 }
 
-function thing()
+function GameInit()
+  Logger.Init()
+  PlayerWrapper.Init()
+  GameLoop.Init(Logger, TriggerWrapper)
+  Commands.Init(Logger, TriggerWrapper, PlayerWrapper)
+  print("after commands")
   PlayerManager.Init(Logger, Colors, PlayerWrapper, TriggerWrapper)
 end
 
 function LaunchLua()
   print("LaunchLua Start")
-  Logger.Init()
-  Logger.Log("LaunchLua Start")
-  GameLoop.Init(Logger, TriggerWrapper)
-  Commands.Init(Logger, TriggerWrapper, PlayerWrapper)
-  print("after commands")
-  xpcall(thing, print)
+  xpcall(GameInit, print)
   print("LaunchLua End")
-  Logger.Log("LaunchLua End")
 end
 
 
