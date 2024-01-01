@@ -1,8 +1,6 @@
 local PlayerManager = {}
 
 
-NO_EXACT_MATCH = false
-COMMAND_ACTIVATOR = "-cmd"
 
 function PlayerManager.PlayerChatAction()
   -- print("Player chat")
@@ -25,17 +23,15 @@ function PlayerManager.Init(logger, colors, playerWrapper, triggerWrapper, strin
   PlayerManager.stringUtil = stringUtil
 
   PlayerManager.playerList = {}
-  PlayerManager.playerChatTrigger = triggerWrapper.CreateTrigger()
-  PlayerManager.triggerWrapper.TriggerAddAction(PlayerManager.playerChatTrigger, PlayerManager.PlayerChatAction)
-  PlayerManager.AnyPlayerChatString()
 end
 
-
+--[[
 function PlayerManager.AnyPlayerChatString()
   for i = 0, PlayerManager.playerWrapper.maxPlayerSlots + 1 do
     PlayerManager.triggerWrapper.TriggerRegisterPlayerChatEvent(PlayerManager.playerChatTrigger, PlayerManager.playerWrapper.Player(i), COMMAND_ACTIVATOR, NO_EXACT_MATCH)
   end
 end
+--]]
 
 
 

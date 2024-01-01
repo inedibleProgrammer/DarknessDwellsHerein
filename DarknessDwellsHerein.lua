@@ -1,6 +1,6 @@
 --[[ Darkness Dwells Herein ]]
 
-UNIT_TEST = true
+-- UNIT_TEST = true
 INTEGRATION_TEST = true
 
 
@@ -22,12 +22,13 @@ end
 
 
 function LaunchIntegrationTests()
-  Logger.Init()
+  Int_Commands.InitTests()
 end
 
 
 function LaunchLua()
   print("LaunchLua Start")
+  -- TriggerSleepAction(2)
 
   if (INTEGRATION_TEST) then
     -- dbg = require("debugger")

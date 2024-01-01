@@ -62,8 +62,10 @@ function Commands.Add(command)
   command.trigger = Commands.triggerWrapper.CreateTrigger()
   Commands.triggerWrapper.TriggerAddAction(command.trigger, command.handler)
 
-  
-  
+  for _,v in pairs(command.users) do
+    Commands.triggerWrapper.TriggerRegisterPlayerChatEvent(command.trigger, v, command.activator, Commands.triggerWrapper.NO_EXACT_MATCH)
+  end
+
   table.insert(Commands.list, command)
   Commands.logger.Log("Command added: " .. command.activator)
 end
@@ -148,14 +150,12 @@ end
 local MapInfo = {}
 MapInfo.name = "Darkness Dwells Herein"
 MapInfo.version = "Alpha"
-MapInfo.commit = "6619da8697b8ef6ad4316ad27c248182d49f5e1e"
+MapInfo.commit = "d1d5220b8d49ce14036c45fdb6141d201fe0e6dc"
 
 
 local PlayerManager = {}
 
 
-NO_EXACT_MATCH = false
-COMMAND_ACTIVATOR = "-cmd"
 
 function PlayerManager.PlayerChatAction()
   -- print("Player chat")
@@ -178,17 +178,15 @@ function PlayerManager.Init(logger, colors, playerWrapper, triggerWrapper, strin
   PlayerManager.stringUtil = stringUtil
 
   PlayerManager.playerList = {}
-  PlayerManager.playerChatTrigger = triggerWrapper.CreateTrigger()
-  PlayerManager.triggerWrapper.TriggerAddAction(PlayerManager.playerChatTrigger, PlayerManager.PlayerChatAction)
-  PlayerManager.AnyPlayerChatString()
 end
 
-
+--[[
 function PlayerManager.AnyPlayerChatString()
   for i = 0, PlayerManager.playerWrapper.maxPlayerSlots + 1 do
     PlayerManager.triggerWrapper.TriggerRegisterPlayerChatEvent(PlayerManager.playerChatTrigger, PlayerManager.playerWrapper.Player(i), COMMAND_ACTIVATOR, NO_EXACT_MATCH)
   end
 end
+--]]
 
 
 
@@ -238,6 +236,13 @@ end
 local TriggerWrapper = {}
 
 
+function TriggerWrapper.Init()
+  TriggerWrapper.EXACT_MATCH = true
+  TriggerWrapper.NO_EXACT_MATCH = false
+  TriggerWrapper.PERIODIC = true
+  TriggerWrapper.NOT_PERIODIC = false
+end
+
 function TriggerWrapper.CreateTrigger()
   local trigger = CreateTrigger()
   return trigger
@@ -248,13 +253,25 @@ function TriggerWrapper.TriggerAddAction(trigger, handler)
   TriggerAddAction(trigger, handler)
 end
 
-function TriggerWrapper.TriggerRegisterTimerEvent(trigger, timeout, periodic)
-  TriggerRegisterTimerEvent(trigger, timeout, periodic)
+-- function TriggerRegisterTimerEvent(whichTrigger, timeout, periodic) end	-- (native)
+function TriggerWrapper.TriggerRegisterTimerEvent(trigger, timeout, isPeriodic)
+  TriggerRegisterTimerEvent(trigger, timeout, isPeriodic)
 end
 
-function TriggerWrapper.TriggerRegisterPlayerChatEvent(trigger, player, messageActivator, exactMatchOnly)
-  TriggerRegisterPlayerChatEvent(trigger, player, messageActivator, exactMatchOnly)
+function TriggerWrapper.TriggerRegisterPlayerChatEvent(trigger, player, messageActivator, isExactMatchOnly)
+  TriggerRegisterPlayerChatEvent(trigger, player, messageActivator, isExactMatchOnly)
 end
+
+-- function GetEventPlayerChatString() end	-- (native)
+function TriggerWrapper.GetEventPlayerChatString()
+  return GetEventPlayerChatString()
+end
+
+-- function GetTriggerPlayer() end	-- (native)
+function TriggerWrapper.GetTriggerPlayer()
+  return GetTriggerPlayer()
+end
+
 
 
 
@@ -408,9 +425,68 @@ end
 
 
 
+local Int_Commands = {}
+
+-- function BlzDisplayChatMessage(whichPlayer, recipient, message) end	-- (native)
+
+function Int_Commands.InitDummyCommand()
+  TriggerWrapper.Init()
+  PlayerWrapper.Init()
+  Commands.Init(Logger, TriggerWrapper, PlayerWrapper, StringUtil)
+  PlayerManager.Init(Logger, Colors, PlayerWrapper, TriggerWrapper, StringUtil)
+
+  Int_Commands.testCommand = {}
+  Int_Commands.testCommand.activator = "-dummy"
+  Int_Commands.testCommand.users = {Player(0)}
+  Int_Commands.testCommand.dummyTestData = "Test will fail"
+  Int_Commands.testCommand.handler = function()
+    print("Handler entered")
+    Int_Commands.testCommand.text = Commands.triggerWrapper.GetEventPlayerChatString()
+    print("1")
+    Int_Commands.testCommand.commandingPlayer = Commands.triggerWrapper.GetTriggerPlayer()
+    print("2")
+    Int_Commands.testCommand.tokens = Commands.stringUtil.Split(Int_Commands.testCommand.text, " ")
+    print("3")
+    Int_Commands.testCommand.dummyTestData = "Test will pass"
+    print("Handler exited")
+  end
+
+  TriggerWrapper.eventPlayerChatString = "-dummy"
+  Commands.Add(Int_Commands.testCommand)
+  -- TriggerSleepAction(1)
+
+  -- assert(testCommand.dummyTestData == "Test will pass", "String must match")
+end
+
+
+function Int_Commands.ChatTestTriggerHandler()
+  print("ChatTestTriggerHandler Start")
+  function TestAsserts()
+    assert(Int_Commands.testCommand.dummyTestData == "Test will pass", "String must match")
+  end
+  xpcall(TestAsserts, print)
+  -- BlzDisplayChatMessage(Player(0), 0, "-dummy")
+  print("ChatTestTriggerHandler End")
+end
+
+function Int_Commands.InitTests()
+  Int_Commands.testAssertsTrigger = TriggerWrapper.CreateTrigger()
+  -- function TriggerRegisterTimerEvent(whichTrigger, timeout, periodic) end	-- (native)
+  TriggerWrapper.TriggerAddAction(Int_Commands.testAssertsTrigger, Int_Commands.ChatTestTriggerHandler)
+  -- TriggerWrapper.TriggerRegisterTimerEvent(Int_Commands.testAssertsTrigger, 1, false)
+
+  -- function TriggerWrapper.TriggerRegisterPlayerChatEvent(trigger, player, messageActivator, isExactMatchOnly)
+  TriggerWrapper.TriggerRegisterPlayerChatEvent(Int_Commands.testAssertsTrigger, Player(0), "-chattest", TriggerWrapper.NOT_EXACT)
+
+  Int_Commands.InitDummyCommand()
+end
+
+
+
+
 --[[ Darkness Dwells Herein ]]
 
-UNIT_TEST = true
+-- UNIT_TEST = true
 INTEGRATION_TEST = true
 
 
@@ -432,12 +508,13 @@ end
 
 
 function LaunchIntegrationTests()
-  Logger.Init()
+  Int_Commands.InitTests()
 end
 
 
 function LaunchLua()
   print("LaunchLua Start")
+  -- TriggerSleepAction(2)
 
   if (INTEGRATION_TEST) then
     -- dbg = require("debugger")
