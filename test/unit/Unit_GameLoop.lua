@@ -1,8 +1,8 @@
 
-Test_GameLoop = {}
+Unit_GameLoop = {}
 
 
-function Test_GameLoop.RunTests()
+function Unit_GameLoop.RunTests()
   assert(GameLoop.ReturnsTrue(), "Expected true")
 end
 

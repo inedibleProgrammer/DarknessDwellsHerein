@@ -1,4 +1,4 @@
-local Test_PlayerManager = {}
+local Unit_PlayerManager = {}
 
 function PlayerManagerReturnsTrue()
   assert(PlayerManager.ReturnsTrue() == true)
@@ -8,7 +8,7 @@ function PlayerManagerAssignsAllPlayers()
   PlayerManager.Init(Logger, Colors, mockPlayerWrapper, mockTriggerWrapper)
 end
 
-function Test_PlayerManager.RunTests()
+function Unit_PlayerManager.RunTests()
   mockPlayerWrapper.maxPlayerSlots = 28
   PlayerManagerReturnsTrue()
   PlayerManagerAssignsAllPlayers()

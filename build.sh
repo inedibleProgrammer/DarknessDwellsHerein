@@ -45,12 +45,21 @@ for file in test/mock/*.lua; do
     echo "" >> "$output_file"  # Add a newline between files
 done
 
-# Concatenate all test .lua files
-for file in test/*.lua; do
+# Concatenate all unit test .lua files
+for file in test/unit/*.lua; do
     [ -e "$file" ] || continue
     cat "$file" >> "$output_file"
     echo "" >> "$output_file"  # Add a newline between files
 done
+
+
+# Concatenate all integration test .lua files
+for file in test/integration/*.lua; do
+    [ -e "$file" ] || continue
+    cat "$file" >> "$output_file"
+    echo "" >> "$output_file"  # Add a newline between files
+done
+
 
 
 

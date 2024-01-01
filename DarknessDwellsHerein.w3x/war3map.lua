@@ -55,20 +55,46 @@ local Commands = {}
 
 
 
-function Commands.Init(logger, triggerWrapper, playerWrapper)
+function Commands.Init(logger, triggerWrapper, playerWrapper, stringUtil)
   Commands.logger = logger
   Commands.triggerWrapper = triggerWrapper
   Commands.playerWrapper = playerWrapper
+  Commands.stringUtil = stringUtil
   Commands.list = {}
 end
 
 function Commands.Add(command)
+  command.trigger = Commands.triggerWrapper.CreateTrigger()
+  Commands.triggerWrapper.TriggerAddAction(command.trigger, command.handler)
+
+  
+  
   table.insert(Commands.list, command)
-  Commands.logger.Log("Command added")
+  Commands.logger.Log("Command added: " .. command.activator)
 end
 
 
 
+
+local GameLog = {}
+
+function GameLog.ReturnsTrue()
+  return true
+end
+
+
+function GameLog.Init(logger, triggerWrapper, commands)
+  GameLog.logger = logger
+  GameLog.triggerWrapper = triggerWrapper
+  GameLog.commands = commands
+
+  GameLog.logCommand = {}
+  GameLog.logCommand.text = "log"
+  GameLog.logCommand.handler = function()
+    print("GameLog Handler")
+  end
+  GameLog.commands.Add(GameLog.triggerWrapper.logCommand)
+end
 
 
 
@@ -79,12 +105,10 @@ function GameLoop.ReturnsTrue()
 end
 
 function GameLoop.Init(logger, triggerWrapper)
-  -- print("GameLoop Init Start")
   GameLoop.logger = logger
   GameLoop.logger.Log("GameLoop Init Start")
   GameLoop.triggerWrapper = triggerWrapper
-  GameLoop.triggerWrapper.CreateTrigger()
-  -- print("GameLoop Init End")
+  GameLoop.loopTrigger = GameLoop.triggerWrapper.CreateTrigger()
   GameLoop.logger.Log("GameLoop Init End")
 end
 
@@ -129,7 +153,7 @@ end
 local MapInfo = {}
 MapInfo.name = "Darkness Dwells Herein"
 MapInfo.version = "Alpha"
-MapInfo.commit = "fe6de9fd31721d75232c561180a0833d6809af47"
+MapInfo.commit = "6619da8697b8ef6ad4316ad27c248182d49f5e1e"
 
 
 local PlayerManager = {}
@@ -138,22 +162,29 @@ local PlayerManager = {}
 NO_EXACT_MATCH = false
 COMMAND_ACTIVATOR = "-cmd"
 
-function PlayerChatAction()
-  print("Player chat")
+function PlayerManager.PlayerChatAction()
+  -- print("Player chat")
+  local command = {}
+  command.text = PlayerManager.triggerWrapper.GetEventPlayerChatString()
+  command.commandingPlayer = PlayerManager.triggerWrapper.GetTriggerPlayer()
+  command.tokens = PlayerManager.stringUtil.Split(command.text, " ")
+
 end
 
 function PlayerManager.ReturnsTrue()
   return true
 end
 
-function PlayerManager.Init(logger, colors, playerWrapper, triggerWrapper)
+function PlayerManager.Init(logger, colors, playerWrapper, triggerWrapper, stringUtil)
   PlayerManager.logger = logger
   PlayerManager.colors = colors
   PlayerManager.playerWrapper = playerWrapper
   PlayerManager.triggerWrapper = triggerWrapper
+  PlayerManager.stringUtil = stringUtil
+
   PlayerManager.playerList = {}
   PlayerManager.playerChatTrigger = triggerWrapper.CreateTrigger()
-  PlayerManager.triggerWrapper.TriggerAddAction(PlayerManager.playerChatTrigger, PlayerChatAction)
+  PlayerManager.triggerWrapper.TriggerAddAction(PlayerManager.playerChatTrigger, PlayerManager.PlayerChatAction)
   PlayerManager.AnyPlayerChatString()
 end
 
@@ -193,6 +224,20 @@ function PrintWrapper.DisplayTextToPlayer(toPlayer, x, y, message)
 end
 
 
+
+local StringUtil = {}
+
+
+function StringUtil.Split(inputStr, sep)
+  if sep == nil then
+    sep = " "
+  end
+  local t = {}
+  for str in string.gmatch(inputStr, "([^"..sep.."]+)") do
+    table.insert(t, str)
+  end
+  return t
+end
 
 
 local TriggerWrapper = {}
@@ -240,13 +285,66 @@ end
 function mockTriggerWrapper.TriggerRegisterPlayerChatEvent(trigger, player, messageActivator, exactMatchOnly)
 end
 
+function mockTriggerWrapper.GetEventPlayerChatString()
+  return mockTriggerWrapper.eventPlayerChatString
+end
+
+function mockTriggerWrapper.GetTriggerPlayer()
+  return mockTriggerWrapper.triggerPlayer
+end
 
 
 
-Test_GameLoop = {}
+local Unit_Commands = {}
 
 
-function Test_GameLoop.RunTests()
+function Unit_Commands.PlayerRunsCommand()
+  Commands.Init(Logger, mockTriggerWrapper, mockPlayerWrapper, StringUtil)
+  PlayerManager.Init(Logger, Colors, mockPlayerWrapper, mockTriggerWrapper, StringUtil)
+
+  local testCommand = {}
+  testCommand.activator = "-dummy"
+  testCommand.users = Commands.ALL_PLAYERS
+  testCommand.dummyTestData = "Test will fail"
+  testCommand.handler = function()
+    testCommand.text = Commands.triggerWrapper.GetEventPlayerChatString()
+    testCommand.commandingPlayer = Commands.triggerWrapper.GetTriggerPlayer()
+    testCommand.tokens = Commands.stringUtil.Split(testCommand.text, " ")
+    testCommand.dummyTestData = "Test will pass"
+  end
+
+  mockTriggerWrapper.eventPlayerChatString = "-dummy"
+  Commands.Add(testCommand)
+  testCommand.handler()
+
+  assert(testCommand.dummyTestData == "Test will pass", "String must match")
+end
+
+function Unit_Commands.RunTests()
+  Unit_Commands.PlayerRunsCommand()
+end
+
+local Unit_GameLog = {}
+
+function Unit_GameLog.ReturnsTrue()
+  assert(GameLog.ReturnsTrue() == true, "Must return true")
+end
+
+function Unit_GameLog.CommandExecutes()
+  Commands.Init(Logger, mockTriggerWrapper, mockPlayerWrapper)
+  PlayerManager.Init(Logger, Colors, mockPlayerWrapper, mockTriggerWrapper, StringUtil)
+end
+
+function Unit_GameLog.RunTests()
+  Unit_GameLog.ReturnsTrue()
+  Unit_GameLog.CommandExecutes()
+end
+
+
+Unit_GameLoop = {}
+
+
+function Unit_GameLoop.RunTests()
   assert(GameLoop.ReturnsTrue(), "Expected true")
 end
 
@@ -254,14 +352,7 @@ end
 
 
 
-local Test_Logger = {}
-
-
-local dummyPrintWrapper = {}
-
-dummyPrintWrapper.DisplayTextToPlayer = function(toPlayer, x, y, message)
-  print(message)
-end
+local Unit_Logger = {}
 
 
 function LoggerReturnsTrue()
@@ -294,7 +385,7 @@ function LoggerPrintsFirst3Messages()
   assert(Logger.Size() == 3)
 end
 
-function Test_Logger.RunTests()
+function Unit_Logger.RunTests()
   LoggerReturnsTrue()
   LoggerReturnsSize()
   LoggerPrintsFirst3Messages()
@@ -304,7 +395,7 @@ end
 
 
 
-local Test_PlayerManager = {}
+local Unit_PlayerManager = {}
 
 function PlayerManagerReturnsTrue()
   assert(PlayerManager.ReturnsTrue() == true)
@@ -314,7 +405,7 @@ function PlayerManagerAssignsAllPlayers()
   PlayerManager.Init(Logger, Colors, mockPlayerWrapper, mockTriggerWrapper)
 end
 
-function Test_PlayerManager.RunTests()
+function Unit_PlayerManager.RunTests()
   mockPlayerWrapper.maxPlayerSlots = 28
   PlayerManagerReturnsTrue()
   PlayerManagerAssignsAllPlayers()
@@ -324,7 +415,8 @@ end
 
 --[[ Darkness Dwells Herein ]]
 
--- UNIT_TEST = true
+UNIT_TEST = true
+INTEGRATION_TEST = true
 
 
 local GameConfig = {}
@@ -340,24 +432,55 @@ function GameInit()
   PlayerWrapper.Init()
   GameLoop.Init(Logger, TriggerWrapper)
   Commands.Init(Logger, TriggerWrapper, PlayerWrapper)
-  print("after commands")
-  PlayerManager.Init(Logger, Colors, PlayerWrapper, TriggerWrapper)
+  PlayerManager.Init(Logger, Colors, PlayerWrapper, TriggerWrapper, StringUtil)
 end
+
+
+function LaunchIntegrationTests()
+  Logger.Init()
+end
+
 
 function LaunchLua()
   print("LaunchLua Start")
-  xpcall(GameInit, print)
-  print("LaunchLua End")
+
+  if (INTEGRATION_TEST) then
+    -- dbg = require("debugger")
+    -- dbg()
+    print("Integration tests enabled")
+    Logger.Init()
+    Logger.Log("Integration tests starting...")
+    xpcall(LaunchIntegrationTests, print)
+    print("Integration tests end")
+  else
+    xpcall(GameInit, print)
+    print("LaunchLua End")
+  end
+end
+
+
+function LaunchUnitTests()
+  Unit_GameLoop.RunTests()
+  Unit_Logger.RunTests()
+  Unit_PlayerManager.RunTests()
+  Unit_GameLog.RunTests()
+  Unit_Commands.RunTests()
 end
 
 
 if (UNIT_TEST) then
   -- dbg = require("debugger")
   -- dbg()
-  Test_GameLoop.RunTests()
-  Test_Logger.RunTests()
-  Test_PlayerManager.RunTests()
+  print("Unit tests enabled")
+  Logger.Init()
+  Logger.Log("Unit tests starting...")
+  xpcall(LaunchUnitTests, print)
+  print("Unit tests end")
 end
+
+
+
+
 
 
 

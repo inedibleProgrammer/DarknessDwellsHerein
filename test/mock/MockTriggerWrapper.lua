@@ -12,4 +12,12 @@ end
 function mockTriggerWrapper.TriggerRegisterPlayerChatEvent(trigger, player, messageActivator, exactMatchOnly)
 end
 
+function mockTriggerWrapper.GetEventPlayerChatString()
+  return mockTriggerWrapper.eventPlayerChatString
+end
+
+function mockTriggerWrapper.GetTriggerPlayer()
+  return mockTriggerWrapper.triggerPlayer
+end
+
 

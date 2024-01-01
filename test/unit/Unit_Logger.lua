@@ -1,12 +1,5 @@
 
-local Test_Logger = {}
-
-
-local dummyPrintWrapper = {}
-
-dummyPrintWrapper.DisplayTextToPlayer = function(toPlayer, x, y, message)
-  print(message)
-end
+local Unit_Logger = {}
 
 
 function LoggerReturnsTrue()
@@ -39,7 +32,7 @@ function LoggerPrintsFirst3Messages()
   assert(Logger.Size() == 3)
 end
 
-function Test_Logger.RunTests()
+function Unit_Logger.RunTests()
   LoggerReturnsTrue()
   LoggerReturnsSize()
   LoggerPrintsFirst3Messages()
