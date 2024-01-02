@@ -21,10 +21,15 @@ end
 
 function Logger.GetMessages(start, count)
   local request = {}
-  for i = start, start + count - 1  do
-    -- message = Logger.messages[i]
-    -- Logger.printWrapper.DisplayTextToPlayer(0, 0, 0, message)
-    table.insert(request, Logger.messages[i])
+
+  if(count == 1) then
+    table.insert(request, Logger.messages[start])
+  else
+    for i = start, start + count - 1  do
+      -- message = Logger.messages[i]
+      -- Logger.printWrapper.DisplayTextToPlayer(0, 0, 0, message)
+      table.insert(request, Logger.messages[i])
+    end
   end
   return request
 end

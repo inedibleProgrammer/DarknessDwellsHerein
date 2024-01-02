@@ -113,22 +113,27 @@ function LogDisplay.Init(logger, commands)
   LogDisplay.logSizeCommand.activator = "-log"
   LogDisplay.logSizeCommand.users = commands.ALL_PLAYERS
   LogDisplay.logSizeCommand.handler = function()
-    print("handler called")
-    LogDisplay.logSizeCommand.text = LogDisplay.commands.triggerWrapper.GetEventPlayerChatString()
-    LogDisplay.logSizeCommand.commandingPlayer = LogDisplay.commands.triggerWrapper.GetTriggerPlayer()
-    LogDisplay.logSizeCommand.tokens = LogDisplay.commands.stringUtil.Split(LogDisplay.logSizeCommand.text, " ")
-    local tokens = LogDisplay.logSizeCommand.tokens
+    local trueHandler = function()
+      LogDisplay.logSizeCommand.text = LogDisplay.commands.triggerWrapper.GetEventPlayerChatString()
+      LogDisplay.logSizeCommand.commandingPlayer = LogDisplay.commands.triggerWrapper.GetTriggerPlayer()
+      LogDisplay.logSizeCommand.tokens = LogDisplay.commands.stringUtil.Split(LogDisplay.logSizeCommand.text, " ")
+      local tokens = LogDisplay.logSizeCommand.tokens
 
-    print("Log command summary: ")
+      print("Log command summary: ")
 
-    if(tokens[2] == "size") then
-      print(logger.Size())
+      if(tokens[2] == "size") then
+        print(logger.Size())
+      else
+        local messages = LogDisplay.logger.GetMessages(tonumber(tokens[2]), tonumber(tokens[3]))
+        for _,v in pairs(messages) do
+          print(v)
+        end
+      end
     end
+    xpcall(trueHandler, print)
   end
 
-  print("AAA")
   commands.Add(LogDisplay.logSizeCommand)
-  print("BBB")
 end
 
 local Logger = {}
@@ -154,10 +159,15 @@ end
 
 function Logger.GetMessages(start, count)
   local request = {}
-  for i = start, start + count - 1  do
-    -- message = Logger.messages[i]
-    -- Logger.printWrapper.DisplayTextToPlayer(0, 0, 0, message)
-    table.insert(request, Logger.messages[i])
+
+  if(count == 1) then
+    table.insert(request, Logger.messages[start])
+  else
+    for i = start, start + count - 1  do
+      -- message = Logger.messages[i]
+      -- Logger.printWrapper.DisplayTextToPlayer(0, 0, 0, message)
+      table.insert(request, Logger.messages[i])
+    end
   end
   return request
 end
@@ -170,7 +180,7 @@ end
 local MapInfo = {}
 MapInfo.name = "Darkness Dwells Herein"
 MapInfo.version = "Alpha"
-MapInfo.commit = "b7bd3900f5b1d32fec5973d5b1a1ed0e0cb5c323"
+MapInfo.commit = "af3cc364ce31049860f3b68e92107afacde44125"
 
 
 local PlayerManager = {}
@@ -384,22 +394,32 @@ end
 
 
 
-
 local Unit_Logger = {}
 
 
-function LoggerReturnsTrue()
-  assert(Logger.ReturnsTrue())
+function Unit_Logger.LoggerReturnsTrue()
+  assert(Logger.ReturnsTrue(), "Must be true")
 end
 
 
-function LoggerReturnsSize()
+function Unit_Logger.LoggerReturnsSize()
   Logger.Init()
   Logger.Log("This is a test")
-  assert(Logger.Size() == 1)
+  assert(Logger.Size() == 1, "Size must be 1")
 end
 
-function LoggerPrintsFirst3Messages()
+function Unit_Logger.LoggerPrintsFirstMessage()
+  Logger.Init()
+  local testData = "First Message"
+
+  Logger.Log(testData)
+
+  local request = Logger.GetMessages(1, 1)
+
+  assert(request[1] == testData, "Strings must match")
+end
+
+function Unit_Logger.LoggerPrintsFirst3Messages()
   Logger.Init()
   local testData = {}
   testData[1] = "First Message"
@@ -415,13 +435,14 @@ function LoggerPrintsFirst3Messages()
     assert(request[i] == testData[i])
   end
 
-  assert(Logger.Size() == 3)
+  assert(Logger.Size() == 3, "Strings must match")
 end
 
 function Unit_Logger.RunTests()
-  LoggerReturnsTrue()
-  LoggerReturnsSize()
-  LoggerPrintsFirst3Messages()
+  Unit_Logger.LoggerReturnsTrue()
+  Unit_Logger.LoggerReturnsSize()
+  Unit_Logger.LoggerPrintsFirstMessage()
+  Unit_Logger.LoggerPrintsFirst3Messages()
 end
 
 
