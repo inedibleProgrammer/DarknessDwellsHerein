@@ -1,7 +1,7 @@
 --[[ Darkness Dwells Herein ]]
 
 -- UNIT_TEST = true
-INTEGRATION_TEST = true
+-- INTEGRATION_TEST = true
 
 
 local GameConfig = {}
@@ -15,8 +15,9 @@ GameConfig.SuperUserList = {
 function GameInit()
   Logger.Init()
   PlayerWrapper.Init()
-  GameLoop.Init(Logger, TriggerWrapper)
-  Commands.Init(Logger, TriggerWrapper, PlayerWrapper)
+  -- GameLoop.Init(Logger, TriggerWrapper)
+  Commands.Init(Logger, TriggerWrapper, PlayerWrapper, StringUtil)
+  LogDisplay.Init(Logger, Commands)
   PlayerManager.Init(Logger, Colors, PlayerWrapper, TriggerWrapper, StringUtil)
 end
 
@@ -49,7 +50,6 @@ function LaunchUnitTests()
   Unit_GameLoop.RunTests()
   Unit_Logger.RunTests()
   Unit_PlayerManager.RunTests()
-  Unit_GameLog.RunTests()
   Unit_Commands.RunTests()
 end
 

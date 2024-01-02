@@ -49,13 +49,16 @@ end
 local Commands = {}
 
 
-
 function Commands.Init(logger, triggerWrapper, playerWrapper, stringUtil)
   Commands.logger = logger
   Commands.triggerWrapper = triggerWrapper
   Commands.playerWrapper = playerWrapper
   Commands.stringUtil = stringUtil
   Commands.list = {}
+  Commands.ALL_PLAYERS = {}
+  for i = 0, playerWrapper.maxPlayerSlots do
+    table.insert(Commands.ALL_PLAYERS, playerWrapper.Player(i))
+  end
 end
 
 function Commands.Add(command)
@@ -72,26 +75,6 @@ end
 
 
 
-
-local GameLog = {}
-
-function GameLog.ReturnsTrue()
-  return true
-end
-
-
-function GameLog.Init(logger, triggerWrapper, commands)
-  GameLog.logger = logger
-  GameLog.triggerWrapper = triggerWrapper
-  GameLog.commands = commands
-
-  GameLog.logCommand = {}
-  GameLog.logCommand.text = "log"
-  GameLog.logCommand.handler = function()
-    print("GameLog Handler")
-  end
-  GameLog.commands.Add(GameLog.triggerWrapper.logCommand)
-end
 
 
 
@@ -110,6 +93,33 @@ function GameLoop.Init(logger, triggerWrapper)
 end
 
 
+
+local LogDisplay = {}
+
+
+
+function LogDisplay.Init(logger, commands)
+  LogDisplay.logger = logger
+  LogDisplay.commands = commands
+
+  LogDisplay.logSizeCommand = {}
+  LogDisplay.logSizeCommand.activator = "-log"
+  LogDisplay.logSizeCommand.users = commands.ALL_PLAYERS
+  LogDisplay.logSizeCommand.handler = function()
+    LogDisplay.logSizeCommand.text = LogDisplay.commands.triggerWrapper.GetEventPlayerChatString()
+    LogDisplay.logSizeCommand.commandingPlayer = LogDisplay.commands.triggerWrapper.GetTriggerPlayer()
+    LogDisplay.logSizeCommand.tokens = LogDisplay.commands.stringUtil.Split(LogDisplay.logSizeCommand.text, " ")
+    local tokens = LogDisplay.logSizeCommand.tokens
+
+    print("Log command summary: ")
+
+    if(tokens[2] == "size") then
+      print(logger.Size())
+    end
+  end
+
+  commands.Add(LogDisplay.logSizeCommand)
+end
 
 local Logger = {}
 
@@ -150,7 +160,7 @@ end
 local MapInfo = {}
 MapInfo.name = "Darkness Dwells Herein"
 MapInfo.version = "Alpha"
-MapInfo.commit = "d1d5220b8d49ce14036c45fdb6141d201fe0e6dc"
+MapInfo.commit = "b7bd3900f5b1d32fec5973d5b1a1ed0e0cb5c323"
 
 
 local PlayerManager = {}
@@ -278,6 +288,7 @@ end
 local mockPlayerWrapper = {}
 
 function mockPlayerWrapper.Player(number)
+  return number
 end
 
 
@@ -427,7 +438,6 @@ end
 
 local Int_Commands = {}
 
--- function BlzDisplayChatMessage(whichPlayer, recipient, message) end	-- (native)
 
 function Int_Commands.InitDummyCommand()
   TriggerWrapper.Init()
@@ -437,25 +447,19 @@ function Int_Commands.InitDummyCommand()
 
   Int_Commands.testCommand = {}
   Int_Commands.testCommand.activator = "-dummy"
-  Int_Commands.testCommand.users = {Player(0)}
+  Int_Commands.testCommand.users = Commands.ALL_PLAYERS
   Int_Commands.testCommand.dummyTestData = "Test will fail"
   Int_Commands.testCommand.handler = function()
-    print("Handler entered")
+    print("testCommand Handler entered")
     Int_Commands.testCommand.text = Commands.triggerWrapper.GetEventPlayerChatString()
-    print("1")
     Int_Commands.testCommand.commandingPlayer = Commands.triggerWrapper.GetTriggerPlayer()
-    print("2")
     Int_Commands.testCommand.tokens = Commands.stringUtil.Split(Int_Commands.testCommand.text, " ")
-    print("3")
     Int_Commands.testCommand.dummyTestData = "Test will pass"
-    print("Handler exited")
+    print("testCommand Handler exited")
   end
 
   TriggerWrapper.eventPlayerChatString = "-dummy"
   Commands.Add(Int_Commands.testCommand)
-  -- TriggerSleepAction(1)
-
-  -- assert(testCommand.dummyTestData == "Test will pass", "String must match")
 end
 
 
@@ -463,21 +467,21 @@ function Int_Commands.ChatTestTriggerHandler()
   print("ChatTestTriggerHandler Start")
   function TestAsserts()
     assert(Int_Commands.testCommand.dummyTestData == "Test will pass", "String must match")
+    assert(Int_Commands.testCommand.tokens[1] == "-dummy", "String must match")
   end
   xpcall(TestAsserts, print)
-  -- BlzDisplayChatMessage(Player(0), 0, "-dummy")
   print("ChatTestTriggerHandler End")
 end
 
+
+--[[
+  - Tests are performed by typing "-dummy" followed by "-chattest"
+--]]
 function Int_Commands.InitTests()
   Int_Commands.testAssertsTrigger = TriggerWrapper.CreateTrigger()
-  -- function TriggerRegisterTimerEvent(whichTrigger, timeout, periodic) end	-- (native)
   TriggerWrapper.TriggerAddAction(Int_Commands.testAssertsTrigger, Int_Commands.ChatTestTriggerHandler)
-  -- TriggerWrapper.TriggerRegisterTimerEvent(Int_Commands.testAssertsTrigger, 1, false)
 
-  -- function TriggerWrapper.TriggerRegisterPlayerChatEvent(trigger, player, messageActivator, isExactMatchOnly)
   TriggerWrapper.TriggerRegisterPlayerChatEvent(Int_Commands.testAssertsTrigger, Player(0), "-chattest", TriggerWrapper.NOT_EXACT)
-
   Int_Commands.InitDummyCommand()
 end
 
@@ -487,7 +491,7 @@ end
 --[[ Darkness Dwells Herein ]]
 
 -- UNIT_TEST = true
-INTEGRATION_TEST = true
+-- INTEGRATION_TEST = true
 
 
 local GameConfig = {}
@@ -501,8 +505,9 @@ GameConfig.SuperUserList = {
 function GameInit()
   Logger.Init()
   PlayerWrapper.Init()
-  GameLoop.Init(Logger, TriggerWrapper)
-  Commands.Init(Logger, TriggerWrapper, PlayerWrapper)
+  -- GameLoop.Init(Logger, TriggerWrapper)
+  Commands.Init(Logger, TriggerWrapper, PlayerWrapper, StringUtil)
+  LogDisplay.Init(Logger, Commands)
   PlayerManager.Init(Logger, Colors, PlayerWrapper, TriggerWrapper, StringUtil)
 end
 
@@ -535,7 +540,6 @@ function LaunchUnitTests()
   Unit_GameLoop.RunTests()
   Unit_Logger.RunTests()
   Unit_PlayerManager.RunTests()
-  Unit_GameLog.RunTests()
   Unit_Commands.RunTests()
 end
 

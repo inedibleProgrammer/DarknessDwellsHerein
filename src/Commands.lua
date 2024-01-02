@@ -1,13 +1,16 @@
 local Commands = {}
 
 
-
 function Commands.Init(logger, triggerWrapper, playerWrapper, stringUtil)
   Commands.logger = logger
   Commands.triggerWrapper = triggerWrapper
   Commands.playerWrapper = playerWrapper
   Commands.stringUtil = stringUtil
   Commands.list = {}
+  Commands.ALL_PLAYERS = {}
+  for i = 0, playerWrapper.maxPlayerSlots do
+    table.insert(Commands.ALL_PLAYERS, playerWrapper.Player(i))
+  end
 end
 
 function Commands.Add(command)
