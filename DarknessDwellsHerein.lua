@@ -14,12 +14,12 @@ GameConfig.SuperUserList = {
 }
 
 function GameInit()
-  Logger.Init()
+  local gameLog = Logger.Init()
   PlayerWrapper.Init()
   -- GameLoop.Init(Logger, TriggerWrapper)
-  Commands.Init(Logger, TriggerWrapper, PlayerWrapper, StringUtil)
-  LogDisplay.Init(Logger, Commands)
-  PlayerManager.Init(Logger, Colors, PlayerWrapper, TriggerWrapper, StringUtil)
+  Commands.Init(gameLog, TriggerWrapper, PlayerWrapper, StringUtil)
+  LogDisplay.Init(gameLog, Commands)
+  PlayerManager.Init(gameLog, Colors, PlayerWrapper, TriggerWrapper, StringUtil)
 end
 
 
@@ -36,9 +36,10 @@ function LaunchLua()
     -- dbg = require("debugger")
     -- dbg()
     print("Integration tests enabled")
-    Logger.Init()
-    Logger.Log("Integration tests starting...")
+    testLog = Logger.Init()
+    testLog.Log("Integration tests starting...")
     xpcall(LaunchIntegrationTests, print)
+    testLog.Log("Integration tests ending...")
     print("Integration tests end")
   else
     xpcall(GameInit, print)
@@ -48,10 +49,10 @@ end
 
 
 function LaunchUnitTests()
-  -- Unit_GameLoop.RunTests()
+  Unit_GameLoop.RunTests()
   Unit_Logger.RunTests()
-  -- Unit_PlayerManager.RunTests()
-  -- Unit_Commands.RunTests()
+  Unit_PlayerManager.RunTests()
+  Unit_Commands.RunTests()
 end
 
 
@@ -59,9 +60,10 @@ if (UNIT_TEST) then
   -- dbg = require("debugger")
   -- dbg()
   print("Unit tests enabled")
-  -- Logger.Init()
-  -- Logger.Log("Unit tests starting...")
+  local testLog = Logger.Init()
+  testLog.Log("Unit tests starting...")
   xpcall(LaunchUnitTests, print)
+  testLog.Log("Unit tests end...")
   print("Unit tests end")
 end
 

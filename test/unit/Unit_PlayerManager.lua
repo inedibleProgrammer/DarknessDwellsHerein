@@ -5,7 +5,8 @@ function PlayerManagerReturnsTrue()
 end
 
 function PlayerManagerAssignsAllPlayers()
-  PlayerManager.Init(Logger, Colors, mockPlayerWrapper, mockTriggerWrapper)
+  local playerManagerLog = Logger.Init()
+  PlayerManager.Init(playerManagerLog, Colors, mockPlayerWrapper, mockTriggerWrapper)
 end
 
 function Unit_PlayerManager.RunTests()

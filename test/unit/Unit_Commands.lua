@@ -2,8 +2,9 @@ local Unit_Commands = {}
 
 
 function Unit_Commands.PlayerRunsCommand()
-  Commands.Init(Logger, mockTriggerWrapper, mockPlayerWrapper, StringUtil)
-  PlayerManager.Init(Logger, Colors, mockPlayerWrapper, mockTriggerWrapper, StringUtil)
+  local commandsLog = Logger.Init()
+  Commands.Init(commandsLog, mockTriggerWrapper, mockPlayerWrapper, StringUtil)
+  PlayerManager.Init(commandsLog, Colors, mockPlayerWrapper, mockTriggerWrapper, StringUtil)
 
   local testCommand = {}
   testCommand.activator = "-dummy"
