@@ -69,6 +69,11 @@ cat "$launch_lua" >> "$output_file"
 
 echo "Concatenation complete. Output saved to: $output_file"
 
+# Static analysis
+luacheck .
+
 # If tests are enabled, they will run. If tests are not enabled, then nothing happens
 lua $output_file
+
+
 

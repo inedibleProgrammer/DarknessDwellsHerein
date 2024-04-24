@@ -2,5 +2,5 @@
 local MapInfo = {}
 MapInfo.name = "Darkness Dwells Herein"
 MapInfo.version = "Alpha"
-MapInfo.commit = "af3cc364ce31049860f3b68e92107afacde44125"
+MapInfo.commit = "9718458b74054b6e9ad7d4ae2a7857d133316ec4"
 

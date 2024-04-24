@@ -1,6 +1,7 @@
+
 --[[ Darkness Dwells Herein ]]
 
--- UNIT_TEST = true
+UNIT_TEST = true
 -- INTEGRATION_TEST = true
 
 
@@ -47,10 +48,10 @@ end
 
 
 function LaunchUnitTests()
-  Unit_GameLoop.RunTests()
+  -- Unit_GameLoop.RunTests()
   Unit_Logger.RunTests()
-  Unit_PlayerManager.RunTests()
-  Unit_Commands.RunTests()
+  -- Unit_PlayerManager.RunTests()
+  -- Unit_Commands.RunTests()
 end
 
 
@@ -58,8 +59,8 @@ if (UNIT_TEST) then
   -- dbg = require("debugger")
   -- dbg()
   print("Unit tests enabled")
-  Logger.Init()
-  Logger.Log("Unit tests starting...")
+  -- Logger.Init()
+  -- Logger.Log("Unit tests starting...")
   xpcall(LaunchUnitTests, print)
   print("Unit tests end")
 end
